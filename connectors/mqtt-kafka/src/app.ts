@@ -33,7 +33,6 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 
 const publishKafka = async (topic, message, key) => {
-	// console.log(key, topic);
 	await producer.connect();
 	const response = await producer.send({
 		topic,
