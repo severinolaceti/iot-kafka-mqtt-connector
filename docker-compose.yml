@@ -1,0 +1,55 @@
+version: "3.2"
+
+services:
+  kafka-mongo:
+    build: ./kafka-mongo
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /app/node_modules
+    env_file:
+      - ./kafka-mongo/.env
+    networks:
+      - webnet
+
+  mqtt-kafka:
+    build: ./mqtt-kafka
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /app/node_modules
+    env_file:
+      - ./mqtt-kafka/.env
+    networks:
+      - webnet
+  kafka-mqtt:
+    build: ./kafka-mqtt
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /app/node_modules
+    env_file:
+      - ./kafka-mqtt/.env
+    networks:
+      - webnet
+
+  mongo:
+    image: mongo
+    restart: always
+    networks:
+      - webnet
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/db:/data/db
+
+networks:
+  webnet:
+    driver: bridge
+
