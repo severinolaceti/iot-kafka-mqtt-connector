@@ -58,7 +58,7 @@ const io = new Server(httpServer, {
 		methods: ['GET', 'POST'], 
 	}
 });
-const checkToken = (authHeader) => {
+const checkToken = (authHeader: any) => {
 	// TODO send auth header to auth service to check
 	console.log(authHeader);
 	return true;
@@ -80,7 +80,7 @@ io.use((socket, next) => {
 		next(new Error('Authentication error'));
 	} 
 });
-const emitSocket = (message, topic ) => {
+const emitSocket = (message: {value: any, key: any}, topic: string ) => {
 	const data = JSON.parse(message.value.toString()).Data;
 	const tzCloud = JSON.parse(message.value.toString()).TimestampCloud;
 	const tz = `${JSON.parse(message.value.toString()).Timestamp}`.length === 19 ? 
