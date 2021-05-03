@@ -48,6 +48,9 @@ const run = async () => {
 				if(result.insertedCount === 1){
 					console.log(new Date().toISOString(), partition, message.key.toString(), topic);
 				}
+				else{
+					console.error(new Date().toISOString(), partition, message.key.toString(), topic);
+				}
 			},
 		});
 
