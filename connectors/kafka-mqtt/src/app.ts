@@ -31,6 +31,15 @@ const kafka = new Kafka({
 	brokers: KAFKA_BROKERS.split(',')
 });
 const consumer = kafka.consumer({ groupId: 'kafka-mqtt-connector' });
+
+const subscribeKafkaTopics = async () => {
+  const admin = kafka.admin ();
+  let kafka_topics = await admin.listTopics();
+    kafka_topics.map((topic) => {
+      consumer.subscribe({ topic, fromBeginning: true });
+    }); 
+};
+
 const publishMqtt = async (bess, topic, message) => {
 	try{
 		const response = await mqttClient.publish(`bess/${bess}/${topic}`, message);
@@ -40,12 +49,16 @@ const publishMqtt = async (bess, topic, message) => {
 		console.error(error);
 	}
 };
+
+
 const run = async () => {
 	try {
 		await consumer.connect();
-		KAFKA_TOPICS.split(',').map(async(topic) => {
-			await consumer.subscribe({ topic, fromBeginning: true });
-		});
+		// KAFKA_TOPICS.split(',').map(async(topic) => {
+		// 	await consumer.subscribe({ topic, fromBeginning: true });
+		// });
+    
+    await subscribeKafkaTopics ();
 
 		await consumer.run({
 			eachMessage: async ({ topic, message }) => {
@@ -55,6 +68,7 @@ const run = async () => {
 					Data: data,
 					Timestamp: new Date().toISOString()
 				}));
+        await subscribeKafkaTopics ();
 			},
 		});
 

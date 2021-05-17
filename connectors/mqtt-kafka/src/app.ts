@@ -23,8 +23,9 @@ mqttClient.on('error', (err) => {
 // Connection callback
 mqttClient.on('connect', () => {
 	console.log('mqtt client connected');
+  mqttClient.subscribe('bess/#', { qos: 0 });
 });
-mqttClient.subscribe('bess/#', { qos: 0 });
+// mqttClient.subscribe('bess/#', { qos: 0 });
 
 const kafka = new Kafka({
 	clientId: 'my-app',
@@ -33,8 +34,9 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 
 const publishKafka = async (topic, message, key) => {
-	await producer.connect();
-	const response = await producer.send({
+  console.log ("Send message to topic " + topic + ": " + message);
+  await producer.connect();	
+  const response = await producer.send({
 		topic,
 		messages: [
 			{ value: message, key },
@@ -49,20 +51,25 @@ const main = async () => {
 	try{
 		const admin = kafka.admin();
 		await admin.connect();
-		const topics = KAFKA_TOPICS.split(',').map(topic => {
-			return {
-				topic,
-				numPartitions: 2,
-				replicationFactor: 1
-			};
-		});
-		await admin.createTopics({
-			topics,
-		});
+		// const topics = KAFKA_TOPICS.split(',').map(topic => {
+		// 	return {
+		// 		topic,
+		// 		numPartitions: 2,
+		// 		replicationFactor: 1
+		// 	};
+		// });
+		// await admin.createTopics({
+		// 	topics,
+		// });
 		mqttClient.on('message', async (topicName, message) => {
 			// message is Buffer
-			const [, key, topic] = topicName.split('/');
-			await publishKafka(topic, message.toString(), key);
+      // const [, key, topic, mid_name1, mid_name2, last_name] = topicName.split('/');
+      
+      const topic_split = topicName.split('/');
+      const key = topic_split [1];
+      const topic_name = topic_split.slice(2,).join("_");
+      console.log ("Message received in " + topic_name + ": " + message.toString());
+			await publishKafka(topic_name, message.toString(), key);
 		});
 		mqttClient.on('close', () => {
 			console.log('MQTT client disconnected');

@@ -20,13 +20,23 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: 'kafka-mongo-connector' });
 
+const subscribeKafkaTopics = async () => {
+  const admin = kafka.admin ();
+  let kafka_topics = await admin.listTopics();
+    kafka_topics.map((topic) => {
+      consumer.subscribe({ topic, fromBeginning: true });
+    }); 
+};
+
 const run = async () => {
 	try {
 		await consumer.connect();
-		KAFKA_TOPICS.split(',').map(async(topic) => {
-			await consumer.subscribe({ topic, fromBeginning: true });
-		});
+		// KAFKA_TOPICS.split(',').map(async(topic) => {
+		// 	await consumer.subscribe({ topic, fromBeginning: true });
+		// });
 
+    subscribeKafkaTopics();
+    
 		await consumer.run({
 			eachMessage: async ({ topic, partition, message }) => {
 				const data = JSON.parse(message.value.toString()).Data;
@@ -51,6 +61,7 @@ const run = async () => {
 				else{
 					console.error(new Date().toISOString(), partition, message.key.toString(), topic);
 				}
+        subscribeKafkaTopics();
 			},
 		});
 

@@ -2,7 +2,7 @@ version: "3.2"
 
 services:
   kafka-mongo:
-    build: ./kafka-mongo
+    build: ./connectors/kafka-mongo
     logging:
       options:
         max-size: "10m"
@@ -10,12 +10,12 @@ services:
     volumes:
       - /app/node_modules
     env_file:
-      - ./kafka-mongo/.env
+      - ./connectors/kafka-mongo/.env
     networks:
       - webnet
 
   mqtt-kafka:
-    build: ./mqtt-kafka
+    build: ./connectors/mqtt-kafka
     logging:
       options:
         max-size: "10m"
@@ -23,11 +23,11 @@ services:
     volumes:
       - /app/node_modules
     env_file:
-      - ./mqtt-kafka/.env
+      - ./connectors/mqtt-kafka/.env
     networks:
       - webnet
   kafka-mqtt:
-    build: ./kafka-mqtt
+    build: ./connectors/kafka-mqtt
     logging:
       options:
         max-size: "10m"
@@ -35,7 +35,7 @@ services:
     volumes:
       - /app/node_modules
     env_file:
-      - ./kafka-mqtt/.env
+      - ./connectors/kafka-mqtt/.env
     networks:
       - webnet
 
